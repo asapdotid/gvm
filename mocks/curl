@@ -8,14 +8,14 @@ set -o errexit
 set -o nounset
 
 BASE_DIR="$(dirname -- "$0")"
-G_URL="https://git.io/g-bin"
-G_LOCATION="$BASE_DIR/../bin/g"
-INSTALL_URL="https://git.io/g-install"
+GVM_URL="https://bit.ly/46WnU6d"
+GVM_LOCATION="$BASE_DIR/../bin/gvm"
+INSTALL_URL="https://bit.ly/471yMzG"
 INSTALL_LOCATION="$BASE_DIR/../bin/install"
 
 for item in "$@"; do
-  if [ "$item" = "$G_URL" ]; then
-    cat "$G_LOCATION"
+  if [ "$item" = "$GVM_URL" ]; then
+    cat "$GVM_LOCATION"
     return
   elif [ "$item" = "$INSTALL_URL" ]; then
     cat "$INSTALL_LOCATION"

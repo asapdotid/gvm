@@ -68,24 +68,24 @@ fi
 IS_UPGRADING=false
 CURRENT_VERSION=
 
-if [ -x "$GOPATH/bin/g" ] && command "$GOPATH/bin/g" --version > /dev/null 2>&1; then
+if [ -x "$GOPATH/bin/gvm" ] && command "$GOPATH/bin/gvm" --version >/dev/null 2>&1; then
   IS_UPGRADING=true
-  CURRENT_VERSION=$(command "$GOPATH/bin/g" --version)
+  CURRENT_VERSION=$(command "$GOPATH/bin/gvm" --version)
 fi
 
 HAS_GO_ALREADY=false
 GO_LOCATION=
 
-if command -v go > /dev/null; then
+if command -v go >/dev/null; then
   HAS_GO_ALREADY=true
   GO_LOCATION=$(command -v go)
 fi
 
 NON_INTERACTIVE=false
 
-G_DOWNLOAD_URL="https://git.io/g-bin"
+GVM_DOWNLOAD_URL="https://bit.ly/46WnU6d"
 
-COMMENT_MESSAGE="g-install: do NOT edit, see https://github.com/stefanmaric/g"
+COMMENT_MESSAGE="gvm-install: do NOT edit, see https://github.com/asapdotid/gvm"
 
 USER_SHELL=
 
@@ -122,7 +122,7 @@ read_user_input() {
     input_device="/dev/tty"
   fi
 
-  if stty -F "$input_device" > /dev/null 2>&1; then
+  if stty -F "$input_device" >/dev/null 2>&1; then
     file_option="-F"
   else
     file_option="-f"
@@ -141,7 +141,7 @@ read_user_input() {
     # Read one byte, using a work around for the fact that command substitution
     # strips the last character.
     c=$(
-      dd if=$input_device bs=1 count=1 2> /dev/null
+      dd if=$input_device bs=1 count=1 2>/dev/null
       echo .
     )
     c=${c%.}
@@ -192,12 +192,12 @@ list_includes() {
 #
 
 download() {
-  if command -v curl > /dev/null; then
+  if command -v curl >/dev/null; then
     params="--location --silent --show-error"
 
     # shellcheck disable=SC2086
     curl $params "$@"
-  elif command -v wget > /dev/null; then
+  elif command -v wget >/dev/null; then
     params="--quiet -O-"
 
     # shellcheck disable=SC2086
@@ -213,24 +213,24 @@ download() {
 
 get_dotfile_for_shell() {
   case "$1" in
-    bash)
-      if [ "$(uname | tr '[:upper:]' '[:lower:]')" = "darwin" ]; then
-        echo "$HOME/.bash_profile"
-      else
-        echo "$HOME/.bashrc"
-      fi
-      ;;
-    fish) echo "$HOME/.config/fish/config.fish" ;;
-    zsh) echo "$HOME/.zshrc" ;;
-    csh) echo "$HOME/.cshrc" ;;
-    tcsh) echo "$HOME/.tcshrc" ;;
-    ash | dash)
-      if [ -z "${ENV:-}" ] || [ ! -f "$ENV" ]; then
-        error_and_abort "for ash and dash, the \$ENV var must be properly configured"
-      else
-        echo "$ENV"
-      fi
-      ;;
+  bash)
+    if [ "$(uname | tr '[:upper:]' '[:lower:]')" = "darwin" ]; then
+      echo "$HOME/.bash_profile"
+    else
+      echo "$HOME/.bashrc"
+    fi
+    ;;
+  fish) echo "$HOME/.config/fish/config.fish" ;;
+  zsh) echo "$HOME/.zshrc" ;;
+  csh) echo "$HOME/.cshrc" ;;
+  tcsh) echo "$HOME/.tcshrc" ;;
+  ash | dash)
+    if [ -z "${ENV:-}" ] || [ ! -f "$ENV" ]; then
+      error_and_abort "for ash and dash, the \$ENV var must be properly configured"
+    else
+      echo "$ENV"
+    fi
+    ;;
   esac
 }
 
@@ -240,20 +240,20 @@ get_dotfile_for_shell() {
 
 get_line_for_shell() {
   case "$1" in
-    ash | dash | bash | zsh | csh | tcsh)
-      printf '\n%s %s %s %s' \
-        "export GOPATH=\"$(pretty_print_path "$GOPATH")\";" \
-        "export GOROOT=\"$(pretty_print_path "$GOROOT")\";" \
-        "export PATH=\"\$GOPATH/bin:\$PATH\";" \
-        "# $COMMENT_MESSAGE"
-      ;;
-    fish)
-      printf '\n%s %s %s %s' \
-        "set -gx GOPATH $(pretty_print_path "$GOPATH");" \
-        "set -gx GOROOT $(pretty_print_path "$GOROOT");" \
-        "set -gx PATH \$GOPATH/bin \$PATH;" \
-        "# $COMMENT_MESSAGE"
-      ;;
+  ash | dash | bash | zsh | csh | tcsh)
+    printf '\n%s %s %s %s' \
+      "export GOPATH=\"$(pretty_print_path "$GOPATH")\";" \
+      "export GOROOT=\"$(pretty_print_path "$GOROOT")\";" \
+      "export PATH=\"\$GOPATH/bin:\$PATH\";" \
+      "# $COMMENT_MESSAGE"
+    ;;
+  fish)
+    printf '\n%s %s %s %s' \
+      "set -gx GOPATH $(pretty_print_path "$GOPATH");" \
+      "set -gx GOROOT $(pretty_print_path "$GOROOT");" \
+      "set -gx PATH \$GOPATH/bin \$PATH;" \
+      "# $COMMENT_MESSAGE"
+    ;;
   esac
 }
 
@@ -261,20 +261,20 @@ get_line_for_shell() {
 # Download g, put it in the right place, and give it execution rights.
 #
 
-install_g() {
+install_gvm() {
   log_info "info" "creating dir $GOPATH/bin"
   mkdir -p "$GOPATH/bin"
-  log_info "info" "copying g in $GOPATH/bin/g"
-  download "$G_DOWNLOAD_URL" > "$GOPATH/bin/g"
+  log_info "info" "copying gvm in $GOPATH/bin/gvm"
+  download "$GVM_DOWNLOAD_URL" >"$GOPATH/bin/gvm"
   log_info "info" "setting permissions"
-  chmod +x "$GOPATH/bin/g"
+  chmod +x "$GOPATH/bin/gvm"
 }
 
 #
 # Check whether 'g' alias is already used, setup alternatives alias if it is
 #
 
-configure_g_alias() {
+configure_gvm_alias() {
   if ! g_alias_defined "$G_ALIAS"; then
     return 0
   fi
@@ -290,7 +290,7 @@ configure_g_alias() {
     if ! prompt_set_alias "$G_ALIAS" "$G_ALIAS_USED_IN_SHELL"; then
       echo
       echo
-      log_info "info" "skipping setup alias for g"
+      log_info "info" "skipping setup alias for gvm"
       G_ALIAS_CHANGED=false
       break
     fi
@@ -326,18 +326,18 @@ g_alias_defined() {
 
 exists() {
   case "$1" in
-    zsh)
-      zsh -ci alias | grep "$2=" > /dev/null
-      ;;
-    bash)
-      bash -ci alias | grep "$2=" > /dev/null
-      ;;
-    fish)
-      fish -c 'alias' | grep " $2 " > /dev/null
-      ;;
-    *)
-      return 1
-      ;;
+  zsh)
+    zsh -ci alias | grep "$2=" >/dev/null
+    ;;
+  bash)
+    bash -ci alias | grep "$2=" >/dev/null
+    ;;
+  fish)
+    fish -c 'alias' | grep " $2 " >/dev/null
+    ;;
+  *)
+    return 1
+    ;;
   esac
 }
 
@@ -352,12 +352,12 @@ prompt_set_alias() {
   read_user_input yes_alias
 
   case $yes_alias in
-    [Yy]*)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
+  [Yy]*)
+    return 0
+    ;;
+  *)
+    return 1
+    ;;
   esac
 }
 
@@ -379,7 +379,7 @@ set_alias_name() {
   alias_name=
   echo >&2
   printf "Enter alias name! [ggovm] " >&2
-  read -r alias_name < $input_device
+  read -r alias_name <$input_device
   echo >&2
   if [ -z "$alias_name" ]; then
     echo "ggovm"
@@ -395,15 +395,15 @@ set_alias_name() {
 configure_selected_shells() {
   for shell in $SELECTED_SHELLS; do
     # First check the dotfile is actually known, then use it.
-    get_dotfile_for_shell "$shell" > /dev/null
+    get_dotfile_for_shell "$shell" >/dev/null
     dotfile_path=$(get_dotfile_for_shell "$shell")
     config_line=$(get_line_for_shell "$shell")
 
-    if test -f "$dotfile_path" && grep "g-install" "$dotfile_path" > /dev/null; then
+    if test -f "$dotfile_path" && grep "g-install" "$dotfile_path" >/dev/null; then
       log_info "info" "skipping $shell because g has been configured already in $dotfile_path"
     else
       log_info "info" "configuring $shell in $dotfile_path"
-      echo "$config_line" >> "$dotfile_path"
+      echo "$config_line" >>"$dotfile_path"
       set_g_alias "$dotfile_path"
     fi
   done
@@ -415,8 +415,8 @@ configure_selected_shells() {
 
 set_g_alias() {
   if [ "$G_ALIAS_CHANGED" = true ]; then
-    alias_line="alias $G_ALIAS=\"\$GOPATH/bin/g\"; # $COMMENT_MESSAGE"
-    echo "$alias_line" >> "$1"
+    alias_line="alias $G_ALIAS=\"\$GOPATH/bin/gvm\"; # $COMMENT_MESSAGE"
+    echo "$alias_line" >>"$1"
   fi
 }
 
@@ -441,7 +441,7 @@ initiate() {
   fi
 
   echo
-  echo "    $GOPATH/bin/g"
+  echo "    $GOPATH/bin/gvm"
   echo
 
   if [ "$IS_UPGRADING" = false ]; then
@@ -455,7 +455,7 @@ initiate() {
     echo
     for shell in $SELECTED_SHELLS; do
       # First check the dotfile is actually known, then use it.
-      get_dotfile_for_shell "$shell" > /dev/null
+      get_dotfile_for_shell "$shell" >/dev/null
       log_info "$shell" "$(get_dotfile_for_shell "$shell")"
     done
     echo
@@ -463,9 +463,9 @@ initiate() {
     if [ "$HAS_GO_ALREADY" = true ]; then
       echo "warning: it appears you have a go installation already at: ${GO_LOCATION}"
       echo
-      echo "    g can still be used alongside and the go versions managed by g will take"
+      echo "    gvm can still be used alongside and the go versions managed by g will take"
       echo "    precedence over your current go installation, only for the current user ($USER)."
-      echo "    For more details, see: https://github.com/stefanmaric/g"
+      echo "    For more details, see: https://github.com/asapdotid/gvm"
       echo
     fi
 
@@ -496,23 +496,23 @@ initiate() {
 
   echo
 
-  install_g
-  configure_g_alias
+  install_gvm
+  configure_gvm_alias
   configure_selected_shells
 
   echo
 
   if [ "$IS_UPGRADING" = true ]; then
-    new_version=$(command "$GOPATH/bin/g" --version)
+    new_version=$(command "$GOPATH/bin/gvm" --version)
 
     if [ "$CURRENT_VERSION" = "$new_version" ]; then
-      echo "g is already up-to-date"
+      echo "gvm is already up-to-date"
     else
-      echo "g has been successfully upgraded from $CURRENT_VERSION to $new_version"
+      echo "gvm has been successfully upgraded from $CURRENT_VERSION to $new_version"
     fi
   else
-    echo "g has been successfully installed"
-    echo "NOTE: restart your shell sessions before using g or go"
+    echo "gvm has been successfully installed"
+    echo "NOTE: restart your shell sessions before using gvm or go"
     echo "For more information, see: https://github.com/stefanmaric/g"
     echo
 
@@ -532,7 +532,7 @@ initiate() {
     export GOROOT
     export GOPATH
     export PATH="$GOPATH/bin:$PATH"
-    exec "$GOPATH/bin/g" install latest
+    exec "$GOPATH/bin/gvm" install latest
   fi
 }
 
@@ -560,11 +560,11 @@ while IFS= read -r shell_path; do
   # This file lists abs paths for installed shells. This at-bottom syntax is to
   # prevent subshells and allow for the loop code to modify global variables.
   # See: https://stackoverflow.com/questions/16854280/
-done < /etc/shells
+done </etc/shells
 
 # This script is useless if it doesn't support any of user's installed shells.
 if [ "${#INSTALLED_SHELLS}" -eq 0 ]; then
-  error_and_abort "none of the supported shells seems installed, see: https://github.com/stefanmaric/g#manually"
+  error_and_abort "none of the supported shells seems installed, see: https://github.com/asapdotid/gvm#manually"
 fi
 
 #
@@ -573,20 +573,20 @@ fi
 
 while test $# -ne 0; do
   case "$1" in
-    -y | --non-interactive) NON_INTERACTIVE=true ;;
-    *)
+  -y | --non-interactive) NON_INTERACTIVE=true ;;
+  *)
+    # shellcheck disable=SC2086
+    if list_includes "$1" $INSTALLED_SHELLS; then
       # shellcheck disable=SC2086
-      if list_includes "$1" $INSTALLED_SHELLS; then
-        # shellcheck disable=SC2086
-        if ! list_includes "$1" $SELECTED_SHELLS; then
-          SELECTED_SHELLS="$SELECTED_SHELLS $1"
-        fi
-      elif list_includes "$1" $SUPPORTED_SHELLS; then
-        error_and_abort "$1 has been selected but is not installed"
-      else
-        error_and_abort "unknown argument or shell \"$1\""
+      if ! list_includes "$1" $SELECTED_SHELLS; then
+        SELECTED_SHELLS="$SELECTED_SHELLS $1"
       fi
-      ;;
+    elif list_includes "$1" $SUPPORTED_SHELLS; then
+      error_and_abort "$1 has been selected but is not installed"
+    else
+      error_and_abort "unknown argument or shell \"$1\""
+    fi
+    ;;
   esac
   shift
 done

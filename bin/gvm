@@ -53,46 +53,46 @@ if [ ! -t 1 ]; then
 fi
 
 case ${TERM:-""} in
-  "xterm"*) ;;
-  "screen"*) ;;
-  *) NO_COLOR=true ;;
+"xterm"*) ;;
+"screen"*) ;;
+*) NO_COLOR=true ;;
 esac
 
 #
 # Information about the tool.
 #
 
-display_g_version() {
+display_gvm_version() {
   echo "0.10.0"
 }
 
 display_help() {
-  cat <<- EOF
+  cat <<-EOF
 
   Simple go version manager, gluten-free.
 
-  Usage: g [COMMAND] [options] [args]
+  Usage: gvm [COMMAND] [options] [args]
 
   Commands:
 
-    g                         Open interactive UI with downloaded versions
-    g install latest          Download and set the latest go release
-    g install <version>       Download and set go <version>
-    g download <version>      Download go <version>
-    g set <version>           Switch to go <version>
-    g run <version>           Run a given version of go
-    g which <version>         Output bin path for <version>
-    g remove <version ...>    Remove the given version(s)
-    g prune                   Remove all versions except the current version
-    g list                    Output downloaded go versions
-    g list-all                Output all available, remote go versions
-    g self-upgrade            Upgrades g to the latest version
-    g help                    Display help information, same as g --help
+    gvm                         Open interactive UI with downloaded versions
+    gvm install latest          Download and set the latest go release
+    gvm install <version>       Download and set go <version>
+    gvm download <version>      Download go <version>
+    gvm set <version>           Switch to go <version>
+    gvm run <version>           Run a given version of go
+    gvm which <version>         Output bin path for <version>
+    gvm remove <version ...>    Remove the given version(s)
+    gvm prune                   Remove all versions except the current version
+    gvm list                    Output downloaded go versions
+    gvm list-all                Output all available, remote go versions
+    gvm self-upgrade            Upgrades gvm to the latest version
+    gvm help                    Display help information, same as gvm --help
 
   Options:
 
     -h, --help                Display help information and exit
-    -v, --version             Output current version of g and exit
+    -v, --version             Output current version of gvm and exit
     -q, --quiet               Suppress almost all output
     -c, --no-color            Force disabled color output
     -y, --non-interactive     Prevent prompts
@@ -100,7 +100,7 @@ display_help() {
     -a, --arch                Override system architecture
     -u, --unstable            Include unstable versions in list
 
-  Visit https://github.com/stefanmaric/g to learn more about g.
+  Visit https://github.com/asapdotid/gvm to learn more about gvm.
 EOF
 }
 
@@ -125,7 +125,7 @@ read_user_input() {
     input_device="/dev/tty"
   fi
 
-  if stty -F "$input_device" > /dev/null 2>&1; then
+  if stty -F "$input_device" >/dev/null 2>&1; then
     file_option="-F"
   else
     file_option="-f"
@@ -144,7 +144,7 @@ read_user_input() {
     # Read one byte, using a work around for the fact that command substitution
     # strips the last character.
     c=$(
-      dd if=$input_device bs=1 count=1 2> /dev/null
+      dd if=$input_device bs=1 count=1 2>/dev/null
       echo .
     )
     c=${c%.}
@@ -281,9 +281,9 @@ is_url_ok() {
 
   # The --head and --spider options of curl and wget, respectively, triggers an
   # HEAD request, to prevent downloading the actual content.
-  if command -v curl > /dev/null; then
+  if command -v curl >/dev/null; then
     cmd="curl --silent --head"
-  elif command -v wget > /dev/null; then
+  elif command -v wget >/dev/null; then
     cmd="wget --quiet --server-response --spider"
   else
     error_and_abort "curl or wget required"
@@ -308,7 +308,7 @@ is_url_ok() {
 #
 
 download_file() {
-  if command -v curl > /dev/null; then
+  if command -v curl >/dev/null; then
     params="--location"
 
     if [ "$QUIET" = true ]; then
@@ -319,11 +319,11 @@ download_file() {
 
     # shellcheck disable=SC2086
     curl $params "$@"
-  elif command -v wget > /dev/null; then
+  elif command -v wget >/dev/null; then
     params="--quiet -O-"
 
     if [ ! "$QUIET" = true ]; then
-      if wget --help 2>&1 | grep -e '--show-progress' > /dev/null; then
+      if wget --help 2>&1 | grep -e '--show-progress' >/dev/null; then
         params="$params --show-progress"
       fi
     fi
@@ -348,12 +348,12 @@ get_all_remote_versions() {
     pattern='go[[:digit:]]+(\.[[:digit:]]+)+\b'
   fi
 
-  download_file 2> /dev/null "https://go.googlesource.com/go/+refs" \
-    | grep -E -o '"/go/\+/refs/tags/go.+?"' \
-    | grep -E -o "$pattern" \
-    | tr -d 'go' \
-    | sort -k 1,1n -k 2,2n -k 3,3n -t . \
-    | uniq
+  download_file 2>/dev/null "https://go.googlesource.com/go/+refs" |
+    grep -E -o '"/go/\+/refs/tags/go.+?"' |
+    grep -E -o "$pattern" |
+    tr -d 'go' |
+    sort -k 1,1n -k 2,2n -k 3,3n -t . |
+    uniq
 }
 
 #
@@ -381,9 +381,9 @@ resolve_version_argument() {
 #
 
 get_installed_versions() {
-  find "$GO_VERSIONS_DIR" -mindepth 1 -maxdepth 1 -type d \
-    | sed "s|$GO_VERSIONS_DIR/||g" \
-    | sort -u -k 1,1n -k 2,2n -k 3,3n -t .
+  find "$GO_VERSIONS_DIR" -mindepth 1 -maxdepth 1 -type d |
+    sed "s|$GO_VERSIONS_DIR/||g" |
+    sort -u -k 1,1n -k 2,2n -k 3,3n -t .
 }
 
 #
@@ -391,9 +391,9 @@ get_installed_versions() {
 #
 
 get_current_version() {
-  if command -v go > /dev/null 2>&1; then
+  if command -v go >/dev/null 2>&1; then
     current=$(go version | cut -d ' ' -f3 | tr -d 'go')
-    if diff > /dev/null 2>&1 "$GO_VERSIONS_DIR/$current/bin/go" "$(command -v go)"; then
+    if diff >/dev/null 2>&1 "$GO_VERSIONS_DIR/$current/bin/go" "$(command -v go)"; then
       echo "$current"
     fi
   fi
@@ -425,9 +425,9 @@ get_tarball_url() {
   arch=
 
   case "$(uname | tr '[:upper:]' '[:lower:]')" in
-    linux*) os=linux ;;
-    darwin*) os=darwin ;;
-    freebsd*) os=freebsd ;;
+  linux*) os=linux ;;
+  darwin*) os=darwin ;;
+  freebsd*) os=freebsd ;;
   esac
 
   # The use of uname -m instead of -a is intended since coreutils' uname will include "i386" on its
@@ -438,12 +438,12 @@ get_tarball_url() {
   # See: https://unix.stackexchange.com/questions/518318/what-does-i386-mean-on-macos-mojave
   # See: https://bug-coreutils.gnu.narkive.com/GMke0VIF/uname-problem-on-mac-os-x
   case "$(uname -m | tr '[:upper:]' '[:lower:]')" in
-    *i686* | *i386*) arch=386 ;;
-    *x86_64*) arch=amd64 ;;
-    *armv6l* | *armv7l*) arch=armv6l ;;
-    *arm64* | *aarch64* | *armv8*) arch=arm64 ;;
-    *ppc64*) arch=ppc64le ;;
-    *s390*) arch=s390x ;;
+  *i686* | *i386*) arch=386 ;;
+  *x86_64*) arch=amd64 ;;
+  *armv6l* | *armv7l*) arch=armv6l ;;
+  *arm64* | *aarch64* | *armv8*) arch=arm64 ;;
+  *ppc64*) arch=ppc64le ;;
+  *s390*) arch=s390x ;;
   esac
 
   if [ -n "$OS" ]; then
@@ -528,49 +528,49 @@ open_interactive_ui() {
   while true; do
     read_user_input key
     case "$key" in
-      "$ESCAPE_SEQ")
-        # Handle ESC sequences followed by other characters, i.e. arrow keys.
-        read_user_input tmp
-        if [ "$tmp" = "[" ]; then
-          read_user_input arrow
-          case $arrow in
-            "$UP")
-              clear
-              selected=$(get_prev_installed_version "$selected")
-              display_installed_with_selected "$selected"
-              ;;
-            "$DOWN")
-              clear
-              selected=$(get_next_installed_version "$selected")
-              display_installed_with_selected "$selected"
-              ;;
-          esac
-        fi
-        ;;
-      "k")
-        clear
-        selected=$(get_prev_installed_version "$selected")
-        display_installed_with_selected "$selected"
-        ;;
-      "j")
-        clear
-        selected=$(get_next_installed_version "$selected")
-        display_installed_with_selected "$selected"
-        ;;
-      "q")
-        clear
+    "$ESCAPE_SEQ")
+      # Handle ESC sequences followed by other characters, i.e. arrow keys.
+      read_user_input tmp
+      if [ "$tmp" = "[" ]; then
+        read_user_input arrow
+        case $arrow in
+        "$UP")
+          clear
+          selected=$(get_prev_installed_version "$selected")
+          display_installed_with_selected "$selected"
+          ;;
+        "$DOWN")
+          clear
+          selected=$(get_next_installed_version "$selected")
+          display_installed_with_selected "$selected"
+          ;;
+        esac
+      fi
+      ;;
+    "k")
+      clear
+      selected=$(get_prev_installed_version "$selected")
+      display_installed_with_selected "$selected"
+      ;;
+    "j")
+      clear
+      selected=$(get_next_installed_version "$selected")
+      display_installed_with_selected "$selected"
+      ;;
+    "q")
+      clear
+      leave_fullscreen
+      exit
+      ;;
+    *)
+      # If the user hit the ENTER key, the variable includes a new line.
+      if [ "$(echo "$key" | wc -l)" -gt 1 ]; then
+        set_version "$selected"
         leave_fullscreen
+        go version
         exit
-        ;;
-      *)
-        # If the user hit the ENTER key, the variable includes a new line.
-        if [ "$(echo "$key" | wc -l)" -gt 1 ]; then
-          set_version "$selected"
-          leave_fullscreen
-          go version
-          exit
-        fi
-        ;;
+      fi
+      ;;
     esac
   done
 }
@@ -588,7 +588,7 @@ set_version() {
     error_and_abort "Version $version is not available. Use 'g install $version' to install it."
   fi
 
-  if [ ! -e "$dir/g.lock" ]; then
+  if [ ! -e "$dir/gvm.lock" ]; then
     for file in "$dir/"*; do
       if [ -L "${GOROOT:?}/$(basename "$file")" ]; then
         rm "${GOROOT:?}/$(basename "$file")"
@@ -646,7 +646,7 @@ download_version() {
   log_info "location" "$dir"
 
   if mkdir -p "$dir"; then
-    touch "$dir/g.lock"
+    touch "$dir/gvm.lock"
   else
     error_and_abort "cannot create $dir"
   fi
@@ -659,7 +659,7 @@ download_version() {
 
   [ $QUIET = false ] && erase_line
 
-  rm -f "$dir/g.lock"
+  rm -f "$dir/gvm.lock"
 
   log_info "downloaded" "$version"
 }
@@ -756,23 +756,23 @@ run_with_version() {
 }
 
 self_upgrade() {
-  if [ ! -x "$GOPATH/bin/g" ]; then
+  if [ ! -x "$GOPATH/bin/gvm" ]; then
     error_and_abort "The self-upgrade command can only be used if g was installed using g-install"
   fi
 
-  if [ "$0" = "$GOPATH/bin/g" ]; then
-    tmp_dir=${TMPDIR:-"/tmp"}/g-update.$$
-    tmp_file=$tmp_dir/g
+  if [ "$0" = "$GOPATH/bin/gvm" ]; then
+    tmp_dir=${TMPDIR:-"/tmp"}/gvm-update.$$
+    tmp_file=$tmp_dir/gvm
     (umask 077 && mkdir "$tmp_dir") || error_and_abort "couldn't create temp dir $tmp_dir"
     cp "$0" "$tmp_file"
     chmod +x "$tmp_file"
     exec "$tmp_file" self-upgrade
   fi
 
-  if command -v curl > /dev/null; then
-    curl -sSL https://git.io/g-install | sh -s -- -y
-  elif command -v wget > /dev/null; then
-    wget -qO- https://git.io/g-install | sh -s -- -y
+  if command -v curl >/dev/null; then
+    curl -sSL https://bit.ly/471yMzG | sh -s -- -y
+  elif command -v wget >/dev/null; then
+    wget -qO- https://bit.ly/471yMzG | sh -s -- -y
   else
     error_and_abort "curl or wget required"
   fi
@@ -826,32 +826,32 @@ if [ $# -eq 0 ]; then
 else
   while test $# -ne 0; do
     case $1 in
-      install | set | download | run | remove | prune | which | list | list-all | self-upgrade) __cmd=$1 ;;
-      -h | --help | help)
-        display_help
-        exit
-        ;;
-      -v | --version)
-        display_g_version
-        exit
-        ;;
-      -q | --quiet) QUIET=true ;;
-      -c | --no-color) NO_COLOR=true ;;
-      -y | --non-interactive) NON_INTERACTIVE=true ;;
-      -o | --os)
-        shift
-        OS=$1
-        ;;
-      -a | --arch)
-        shift
-        ARCH=$1
-        ;;
-      -u | --unstable) INCLUDE_UNSTABLE=true ;;
-      --)
-        __cmd_args="$__cmd_args $*"
-        break
-        ;;
-      *) __cmd_args="$__cmd_args $1" ;;
+    install | set | download | run | remove | prune | which | list | list-all | self-upgrade) __cmd=$1 ;;
+    -h | --help | help)
+      display_help
+      exit
+      ;;
+    -v | --version)
+      display_gvm_version
+      exit
+      ;;
+    -q | --quiet) QUIET=true ;;
+    -c | --no-color) NO_COLOR=true ;;
+    -y | --non-interactive) NON_INTERACTIVE=true ;;
+    -o | --os)
+      shift
+      OS=$1
+      ;;
+    -a | --arch)
+      shift
+      ARCH=$1
+      ;;
+    -u | --unstable) INCLUDE_UNSTABLE=true ;;
+    --)
+      __cmd_args="$__cmd_args $*"
+      break
+      ;;
+    *) __cmd_args="$__cmd_args $1" ;;
     esac
     shift
   done
@@ -859,16 +859,16 @@ else
   # The unquoted expansions here are intentional.
   # shellcheck disable=SC2086
   case $__cmd in
-    install) install_version $__cmd_args ;;
-    download) download_version $__cmd_args ;;
-    set) set_version $__cmd_args ;;
-    run) run_with_version $__cmd_args ;;
-    remove) remove_versions $__cmd_args ;;
-    prune) prune_versions ;;
-    which) display_bin_path_for_version $__cmd_args ;;
-    list) display_installed_with_selected "$(get_current_version)" ;;
-    list-all) display_remote_versions ;;
-    self-upgrade) self_upgrade ;;
-    *) error_help_abort "Invalid command $__cmd" ;;
+  install) install_version $__cmd_args ;;
+  download) download_version $__cmd_args ;;
+  set) set_version $__cmd_args ;;
+  run) run_with_version $__cmd_args ;;
+  remove) remove_versions $__cmd_args ;;
+  prune) prune_versions ;;
+  which) display_bin_path_for_version $__cmd_args ;;
+  list) display_installed_with_selected "$(get_current_version)" ;;
+  list-all) display_remote_versions ;;
+  self-upgrade) self_upgrade ;;
+  *) error_help_abort "Invalid command $__cmd" ;;
   esac
 fi
