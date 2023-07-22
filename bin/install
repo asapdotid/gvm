@@ -97,9 +97,9 @@ SUPPORTED_SHELLS="ash dash bash csh tsch zsh fish"
 INSTALLED_SHELLS=""
 SELECTED_SHELLS=""
 
-G_ALIAS="g"
-G_ALIAS_CHANGED=false
-G_ALIAS_USED_IN_SHELL=""
+GVM_ALIAS="gvm"
+GVM_ALIAS_CHANGED=false
+GVM_ALIAS_USED_IN_SHELL=""
 
 #
 # POSIX utils.
@@ -271,31 +271,31 @@ install_gvm() {
 }
 
 #
-# Check whether 'g' alias is already used, setup alternatives alias if it is
+# Check whether 'gvm' alias is already used, setup alternatives alias if it is
 #
 
 configure_gvm_alias() {
-  if ! g_alias_defined "$G_ALIAS"; then
+  if ! g_alias_defined "$GVM_ALIAS"; then
     return 0
   fi
 
-  G_ALIAS_CHANGED=true
+  GVM_ALIAS_CHANGED=true
 
   if [ "$NON_INTERACTIVE" = true ]; then
-    G_ALIAS="govm"
+    GVM_ALIAS="govm"
     return 0
   fi
 
-  while g_alias_defined "$G_ALIAS"; do
-    if ! prompt_set_alias "$G_ALIAS" "$G_ALIAS_USED_IN_SHELL"; then
+  while g_alias_defined "$GVM_ALIAS"; do
+    if ! prompt_set_alias "$GVM_ALIAS" "$GVM_ALIAS_USED_IN_SHELL"; then
       echo
       echo
       log_info "info" "skipping setup alias for gvm"
-      G_ALIAS_CHANGED=false
+      GVM_ALIAS_CHANGED=false
       break
     fi
 
-    G_ALIAS=$(set_alias_name)
+    GVM_ALIAS=$(set_alias_name)
   done
 }
 
@@ -309,7 +309,7 @@ g_alias_defined() {
   for shell in $SELECTED_SHELLS; do
     if exists "$shell" "$1"; then
       alias_already_used=true
-      G_ALIAS_USED_IN_SHELL="$shell"
+      GVM_ALIAS_USED_IN_SHELL="$shell"
     fi
   done
 
@@ -414,8 +414,8 @@ configure_selected_shells() {
 #
 
 set_g_alias() {
-  if [ "$G_ALIAS_CHANGED" = true ]; then
-    alias_line="alias $G_ALIAS=\"\$GOPATH/bin/gvm\"; # $COMMENT_MESSAGE"
+  if [ "$GVM_ALIAS_CHANGED" = true ]; then
+    alias_line="alias $GVM_ALIAS=\"\$GOPATH/bin/gvm\"; # $COMMENT_MESSAGE"
     echo "$alias_line" >>"$1"
   fi
 }
