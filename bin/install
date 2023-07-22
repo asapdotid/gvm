@@ -404,7 +404,7 @@ configure_selected_shells() {
     else
       log_info "info" "configuring $shell in $dotfile_path"
       echo "$config_line" >>"$dotfile_path"
-      set_g_alias "$dotfile_path"
+      set_gvm_alias "$dotfile_path"
     fi
   done
 }
@@ -413,7 +413,7 @@ configure_selected_shells() {
 # set alias in dotfile
 #
 
-set_g_alias() {
+set_gvm_alias() {
   if [ "$GVM_ALIAS_CHANGED" = true ]; then
     alias_line="alias $GVM_ALIAS=\"\$GOPATH/bin/gvm\"; # $COMMENT_MESSAGE"
     echo "$alias_line" >>"$1"
