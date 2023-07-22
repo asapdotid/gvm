@@ -282,7 +282,7 @@ configure_gvm_alias() {
   G_ALIAS_CHANGED=true
 
   if [ "$NON_INTERACTIVE" = true ]; then
-    G_ALIAS="ggovm"
+    G_ALIAS="govm"
     return 0
   fi
 
@@ -378,11 +378,11 @@ set_alias_name() {
 
   alias_name=
   echo >&2
-  printf "Enter alias name! [ggovm] " >&2
+  printf "Enter alias name! [govm] " >&2
   read -r alias_name <$input_device
   echo >&2
   if [ -z "$alias_name" ]; then
-    echo "ggovm"
+    echo "govm"
   else
     echo "$alias_name"
   fi
@@ -399,8 +399,8 @@ configure_selected_shells() {
     dotfile_path=$(get_dotfile_for_shell "$shell")
     config_line=$(get_line_for_shell "$shell")
 
-    if test -f "$dotfile_path" && grep "g-install" "$dotfile_path" >/dev/null; then
-      log_info "info" "skipping $shell because g has been configured already in $dotfile_path"
+    if test -f "$dotfile_path" && grep "gvm-install" "$dotfile_path" >/dev/null; then
+      log_info "info" "skipping $shell because gvm has been configured already in $dotfile_path"
     else
       log_info "info" "configuring $shell in $dotfile_path"
       echo "$config_line" >>"$dotfile_path"
@@ -425,8 +425,8 @@ set_g_alias() {
 #
 
 initiate() {
-  yes_g=
-  yes_go=
+  yes_gvm=
+  yes_gvmo=
 
   if [ "${#SELECTED_SHELLS}" -eq 0 ]; then
     error_and_abort "no shell has been selected for installation"
@@ -435,9 +435,9 @@ initiate() {
   echo
 
   if [ "$IS_UPGRADING" = true ]; then
-    echo "You are about to upgrade g, the gluten-free go version manager at:"
+    echo "You are about to upgrade gvm, the gluten-free go version manager at:"
   else
-    echo "You are about to install g, the gluten-free go version manager at:"
+    echo "You are about to install gvm, the gluten-free go version manager at:"
   fi
 
   echo
@@ -484,11 +484,11 @@ initiate() {
 
   if [ "$NON_INTERACTIVE" = false ]; then
     printf "Do you want to continue? [y/N] "
-    read_user_input yes_g
+    read_user_input yes_gvm
 
     echo
 
-    if [ "$yes_g" != "y" ]; then
+    if [ "$yes_gvm" != "y" ]; then
       echo "Aborted"
       exit 1
     fi
@@ -518,11 +518,11 @@ initiate() {
 
     if [ "$NON_INTERACTIVE" = false ]; then
       printf "Do you want to install the latest go version? [y/N] "
-      read_user_input yes_go
+      read_user_input yes_gvmo
 
       echo
 
-      if [ "$yes_go" != "y" ]; then
+      if [ "$yes_gvmo" != "y" ]; then
         exit 0
       fi
     fi
