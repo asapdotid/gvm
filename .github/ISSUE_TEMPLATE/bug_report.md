@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 **Describe the bug**
@@ -37,7 +36,7 @@ echo SHELL: "$SHELL"
 echo /etc/shells content:
 cat /etc/shells
 echo go location: (which go) && echo go version: (go version)
-echo g location: (which g) && echo g version: (g --version)
+echo gvm location: (which gvm) && echo g version: (gvm --version)
 echo GOROOT: "$GOROOT"
 echo GOPATH:  "$GOPATH""
 ```
