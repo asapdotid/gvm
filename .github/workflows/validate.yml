@@ -9,10 +9,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache dev dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./.tmp
           key: ${{ runner.os }}-dependencies-${{ hashFiles('./Makefile') }}
@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Mock cURL and wget
         run: |
@@ -37,14 +37,14 @@ jobs:
           echo "REAL_WGET=$(which wget)" >> $GITHUB_ENV
           echo "$(pwd)/mocks/" >> $GITHUB_PATH
 
-      - name: Install g using g-install with default options
-        run: curl -sSL https://git.io/g-install | sh -s -- -y bash
+      - name: Install gvm using gvm-install with default options
+        run: curl -sSL https://bit.ly/gvm-install | sh -s -- -y bash
 
       - name: Verify environment variables
         run: test ! -z "${GOROOT?}" && test ! -z "${GOPATH?}"
 
-      - name: Verify g installation
-        run: g --version
+      - name: Verify gvm installation
+        run: gvm --version
 
       - name: Verify go installation
         run: go version
@@ -53,7 +53,7 @@ jobs:
         run: test "$(which go)" = "$GOPATH/bin/go"
 
       - name: Make sure g can switch versions
-        run: g install 1.14.15 && go version | grep -1 "go1.14.15"
+        run: gvm install 1.14.15 && go version | grep -1 "go1.14.15"
 
-      - name: Make sure g can self-upgrade
-        run: SHELL="$(which bash)" g self-upgrade
+      - name: Make sure gvm can self-upgrade
+        run: SHELL="$(which bash)" gvm self-upgrade
