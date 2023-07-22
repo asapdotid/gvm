@@ -83,7 +83,7 @@ fi
 
 NON_INTERACTIVE=false
 
-GVM_DOWNLOAD_URL="https://bit.ly/46WnU6d"
+GVM_DOWNLOAD_URL="https://bit.ly/gvm-bin"
 
 COMMENT_MESSAGE="gvm-install: do NOT edit, see https://github.com/asapdotid/gvm"
 
