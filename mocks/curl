@@ -8,9 +8,9 @@ set -o errexit
 set -o nounset
 
 BASE_DIR="$(dirname -- "$0")"
-GVM_URL="https://bit.ly/46WnU6d"
+GVM_URL="https://bit.ly/gvm-bin"
 GVM_LOCATION="$BASE_DIR/../bin/gvm"
-INSTALL_URL="https://bit.ly/471yMzG"
+INSTALL_URL="https://bit.ly/gvm-install"
 INSTALL_LOCATION="$BASE_DIR/../bin/install"
 
 for item in "$@"; do
