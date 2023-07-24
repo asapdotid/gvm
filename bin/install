@@ -55,7 +55,7 @@ log_info() {
 #
 
 GOPATH=${GOPATH:-$HOME/go}
-GOROOT=${GOROOT:-$HOME/.go}
+GOROOT=${GOROOT:-$HOME/.gvm}
 
 if [ "$(echo "$GOPATH" | cut -c1)" != "/" ]; then
   error_and_abort "\$GOPATH must be an absolute path but it is set to $GOPATH"
@@ -472,10 +472,10 @@ initiate() {
     if [ "$GOPATH" != "$HOME/go" ]; then
       echo "warning: using a non-default \$GOPATH: $(pretty_print_path "$GOPATH")"
     fi
-    if [ "$GOROOT" != "$HOME/.go" ]; then
+    if [ "$GOROOT" != "$HOME/.gvm" ]; then
       echo "warning: using a non-default \$GOROOT: $(pretty_print_path "$GOROOT")"
     fi
-    if [ "$GOPATH" != "$HOME/go" ] || [ "$GOROOT" != "$HOME/.go" ]; then
+    if [ "$GOPATH" != "$HOME/go" ] || [ "$GOROOT" != "$HOME/.gvm" ]; then
       echo
       echo "    This usually presents no problem, but be sure it is intended."
       echo
@@ -513,7 +513,7 @@ initiate() {
   else
     echo "gvm has been successfully installed"
     echo "NOTE: restart your shell sessions before using gvm or go"
-    echo "For more information, see: https://github.com/stefanmaric/g"
+    echo "For more information, see: https://github.com/asapdotid/gvm"
     echo
 
     if [ "$NON_INTERACTIVE" = false ]; then

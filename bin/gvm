@@ -585,7 +585,7 @@ set_version() {
   dir="$GO_VERSIONS_DIR/$version"
 
   if [ ! -d "$dir" ]; then
-    error_and_abort "Version $version is not available. Use 'g install $version' to install it."
+    error_and_abort "Version $version is not available. Use 'gvm install $version' to install it."
   fi
 
   if [ ! -e "$dir/gvm.lock" ]; then
@@ -757,7 +757,7 @@ run_with_version() {
 
 self_upgrade() {
   if [ ! -x "$GOPATH/bin/gvm" ]; then
-    error_and_abort "The self-upgrade command can only be used if g was installed using g-install"
+    error_and_abort "The self-upgrade command can only be used if gvm was installed using gvm-install"
   fi
 
   if [ "$0" = "$GOPATH/bin/gvm" ]; then
@@ -770,9 +770,9 @@ self_upgrade() {
   fi
 
   if command -v curl >/dev/null; then
-    curl -sSL https://bit.ly/471yMzG | sh -s -- -y
+    curl -sSL https://bit.ly/gvm-install | sh -s -- -y
   elif command -v wget >/dev/null; then
-    wget -qO- https://bit.ly/471yMzG | sh -s -- -y
+    wget -qO- https://bit.ly/gvm-install | sh -s -- -y
   else
     error_and_abort "curl or wget required"
   fi
