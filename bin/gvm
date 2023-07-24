@@ -63,7 +63,7 @@ esac
 #
 
 display_gvm_version() {
-  echo "0.10.0"
+  echo "0.1.0"
 }
 
 display_help() {
