@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+## Modified version 0.1.0 - 2023-07-24
 
-## 0.10.0 - 2023-06-10
+- Rename g to gvm
+- Change GOPATH
+- Change url install and bin
+
+## Clone verion 0.10.0 - 2023-06-10
 
 - Add description and website to help command
 - Fix Github Actions tests workflow on newer versions of Ubuntu
