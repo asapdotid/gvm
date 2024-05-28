@@ -54,7 +54,7 @@ log_info() {
 # Pre-check environment variables.
 #
 
-GOPATH=${GOPATH:-$HOME/go}
+GOPATH=${GOPATH:-$HOME/.local/share/go}
 GOROOT=${GOROOT:-$HOME/.gvm}
 
 if [ "$(echo "$GOPATH" | cut -c1)" != "/" ]; then
@@ -241,14 +241,16 @@ get_dotfile_for_shell() {
 get_line_for_shell() {
   case "$1" in
   ash | dash | bash | zsh | csh | tcsh)
-    printf '\n%s %s %s %s' \
+    printf '\n%s \n%s \n%s \n%s \n%s' \
+      "# Golang Version Manager" \
       "export GOPATH=\"$(pretty_print_path "$GOPATH")\";" \
       "export GOROOT=\"$(pretty_print_path "$GOROOT")\";" \
       "export PATH=\"\$GOPATH/bin:\$PATH\";" \
       "# $COMMENT_MESSAGE"
     ;;
   fish)
-    printf '\n%s %s %s %s' \
+    printf '\n%s \n%s \n%s \n%s \n%s' \
+      "# Golang Version Manager" \
       "set -gx GOPATH $(pretty_print_path "$GOPATH");" \
       "set -gx GOROOT $(pretty_print_path "$GOROOT");" \
       "set -gx PATH \$GOPATH/bin \$PATH;" \
@@ -469,13 +471,13 @@ initiate() {
       echo
     fi
 
-    if [ "$GOPATH" != "$HOME/go" ]; then
+    if [ "$GOPATH" != "$HOME/.local/share/go" ]; then
       echo "warning: using a non-default \$GOPATH: $(pretty_print_path "$GOPATH")"
     fi
     if [ "$GOROOT" != "$HOME/.gvm" ]; then
       echo "warning: using a non-default \$GOROOT: $(pretty_print_path "$GOROOT")"
     fi
-    if [ "$GOPATH" != "$HOME/go" ] || [ "$GOROOT" != "$HOME/.gvm" ]; then
+    if [ "$GOPATH" != "$HOME/.local/share/go" ] || [ "$GOROOT" != "$HOME/.gvm" ]; then
       echo
       echo "    This usually presents no problem, but be sure it is intended."
       echo

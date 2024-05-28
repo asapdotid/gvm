@@ -100,8 +100,8 @@ curl -sSL https://bit.ly/gvm-install | sh -s -- -y
 By default, these go environment variables are used:
 
 ```shell
-GOROOT: $HOME/.go
-GOPATH: $HOME/go
+export GOPATH="$HOME/.gvm";
+export GOROOT="$HOME/.local/share/go";
 ```
 
 `$GOPATH/bin` is added to the `PATH` and there's where `gvm` is copied to.
